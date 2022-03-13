@@ -16,7 +16,6 @@ START = pygame.image.load("images/start_button.png")
 BOSS1 = pygame.image.load("images/ben_boss.png")
 BOSS2 = pygame.image.load("images/ben_spiderman.png")
 ENEMY = pygame.image.load("images/enemy.png")
-ENEMY_BULLET = pygame.image.load("images/enemybullet.png")
 
 BCIT_SHIP = pygame.image.load("images/bcit_ship.png")
 BULLET = pygame.image.load("images/bullet.png")
@@ -24,25 +23,6 @@ BULLET = pygame.image.load("images/bullet.png")
 pygame.display.set_caption("BCIT INVADERS")
 
 class Bullet:
-    def __init__(self, x, y, img):
-        self.x = x
-        self.y = y
-        self.img = img
-        self.mask = pygame.mask.from_surface(self.img)
-
-    def draw(self, window):
-        window.blit(self.img, (self.x, self.y))
-
-    def move(self, vel):
-        self.y += vel
-
-    def reach_end(self, height):
-        return not(self.y <= height and self.y >= 0)
-
-    def impact(self, object):
-        return ship_impact(self, object)
-
-class Enemy_bullet:
     def __init__(self, x, y, img):
         self.x = x
         self.y = y
@@ -105,9 +85,6 @@ class ship:
     
     def get_width(self):
         return self.ship_img.get_width()
-    
-    def draw(self, window):
-        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y, 50, 50))
 
 class Player(ship):
     def __init__(self, x, y, health=10):
@@ -142,7 +119,7 @@ class Enemy(ship):
     def __init__(self, x,  y, health=10):
         super().__init__(x, y, health)
         self.ship_img = ENEMY
-        self.bullet_img = ENEMY_BULLET
+        self.bullet_img = BULLET
         self.mask = pygame.mask.from_surface(self.ship_img)
 
     def movement(self, vel):
@@ -150,7 +127,7 @@ class Enemy(ship):
 
     def shoot(self):
         if self.cool_down_counter == 0:
-            enemybullet = Enemy_bullet(self.x-20, self.y, self.bullet_img)
+            enemybullet = Bullet(self.x-20, self.y, self.bullet_img)
             self.bullets.append(enemybullet)
             self.cool_down_counter = 1
 
@@ -164,7 +141,7 @@ def game():
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play(-1)
     lives = 3
-    round = 1
+    round = 0
     frames = 60
     clock = pygame.time.Clock()
     play = True
@@ -176,7 +153,7 @@ def game():
     round_length = 2
     enemy_velocity = 1
 
-    player_ship = Player(300, 630)
+    player_ship = Player(446, 630)
 
     lose = False
     lose_count = 0
@@ -191,9 +168,19 @@ def game():
         MAIN_WINDOW.blit(round_num, (WIN_WIDTH - round_num.get_width() - 10, 10))
 
         player_ship.draw(MAIN_WINDOW)
+        #play_height = game_font.render(f"player height = {player_ship.get_height()}", 1, (255, 255, 255))
+        #play_width = game_font.render(f"player width = {player_ship.get_width()}", 1, (255, 255, 255))
+        #MAIN_WINDOW.blit(play_height, (500, 500))
+        #MAIN_WINDOW.blit(play_width, (400, 400))
+
 
         for enemy in listenemies:
             enemy.draw(MAIN_WINDOW)
+        
+            #enemy_height = game_font.render(f"enemy height = {enemy.get_height()}", 1, (255, 255, 255))
+            #enemy_width = game_font.render(f"enemy width = {enemy.get_width()}", 1, (255, 255, 255))
+            #MAIN_WINDOW.blit(enemy_height, (100, 100))
+            #MAIN_WINDOW.blit(enemy_width, (200, 200))
 
         if lose:
             lose_text = lose_font.render("Read the textbook", 1, (255, 255, 255))
