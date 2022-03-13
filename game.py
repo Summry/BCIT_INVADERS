@@ -99,7 +99,7 @@ class ship:
             self.bullets.append(bullet)
             self.cool_down_counter = 1
             bullet_sound = pygame.mixer.Sound("song/bulletsound.wav")
-            bullet_sound.set_volume(0.2)
+            bullet_sound.set_volume(0.1)
             pygame.mixer.Sound.play(bullet_sound)
 
     def get_height(self):
@@ -158,7 +158,7 @@ class Enemy(ship):
             self.bullets.append(enemybullet)
             self.cool_down_counter = 1
             bullet_sound = pygame.mixer.Sound("song/bulletsound.wav")
-            bullet_sound.set_volume(0.2)
+            bullet_sound.set_volume(0.1)
             pygame.mixer.Sound.play(bullet_sound)
 
 def ship_impact(object1, object2):
