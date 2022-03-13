@@ -99,7 +99,7 @@ class ship:
             self.bullets.append(bullet)
             self.cool_down_counter = 1
             bullet_sound = pygame.mixer.Sound("song/bulletsound.wav")
-            bullet_sound.set_volume(0.3)
+            bullet_sound.set_volume(0.2)
             pygame.mixer.Sound.play(bullet_sound)
 
     def get_height(self):
@@ -158,7 +158,7 @@ class Enemy(ship):
             self.bullets.append(enemybullet)
             self.cool_down_counter = 1
             bullet_sound = pygame.mixer.Sound("song/bulletsound.wav")
-            bullet_sound.set_volume(0.3)
+            bullet_sound.set_volume(0.2)
             pygame.mixer.Sound.play(bullet_sound)
 
 def ship_impact(object1, object2):
@@ -168,7 +168,7 @@ def ship_impact(object1, object2):
 
 def game():
     pygame.mixer.music.load("song/Game_Music.wav")
-    pygame.mixer.music.set_volume(0.2)
+    pygame.mixer.music.set_volume(0.1)
     pygame.mixer.music.play(-1)
     lives = 3
     round = 0
@@ -180,7 +180,7 @@ def game():
     bullet_speed = 7
 
     listenemies = []
-    round_length = 2
+    round_length = 3
     enemy_velocity = 1
 
     player_ship = Player(446, 630)
@@ -231,7 +231,7 @@ def game():
         
         if len(listenemies) == 0:
             round += 1
-            round_length += 2
+            round_length += 3
             for count in range(round_length):
                 enemy = Enemy(random.randrange(50, WIN_WIDTH-100), random.randrange(-1000, -100), random.choice(["ship1", "ship2", "ship3"]))
                 listenemies.append(enemy)
@@ -269,13 +269,13 @@ def game():
         player_ship.move_bullet(-bullet_speed, listenemies)
 
     pygame.mixer.music.stop()
-    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.set_volume(0.3)
     pygame.mixer.music.load('song/Menu_Music.wav')
     pygame.mixer.music.play(-1)
 
 def mainmenu():
     mainscreen = True
-    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.set_volume(0.3)
     pygame.mixer.music.load('song/Menu_Music.wav')
     pygame.mixer.music.play(-1)
     while mainscreen:
