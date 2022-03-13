@@ -4,7 +4,6 @@ import random
 pygame.font.init()
 pygame.init()
 game_font = pygame.font.SysFont("verdana", 30)
-lose_font = pygame.font.SysFont("verdana", 20)
 
 WIN_WIDTH = 1000
 WIN_HEIGHT = 700
@@ -13,9 +12,10 @@ SPACE_BACKGROUND = pygame.transform.scale(pygame.image.load("images/space-backgr
 START_MENU = pygame.image.load("images/menu_title.png")
 START = pygame.image.load("images/start_button.png")
 
-BOSS1 = pygame.image.load("images/ben_boss.png")
-BOSS2 = pygame.image.load("images/ben_spiderman.png")
+ENEMY3 = pygame.image.load("images/ben_boss.png")
+ENEMY2 = pygame.image.load("images/ben_spiderman.png")
 ENEMY = pygame.image.load("images/enemy.png")
+ENEMY_BULLET = pygame.image.load("images/enemybullet.png")
 
 BCIT_SHIP = pygame.image.load("images/bcit_ship.png")
 BULLET = pygame.image.load("images/bullet.png")
@@ -23,6 +23,25 @@ BULLET = pygame.image.load("images/bullet.png")
 pygame.display.set_caption("BCIT INVADERS")
 
 class Bullet:
+    def __init__(self, x, y, img):
+        self.x = x
+        self.y = y
+        self.img = img
+        self.mask = pygame.mask.from_surface(self.img)
+
+    def draw(self, window):
+        window.blit(self.img, (self.x, self.y))
+
+    def move(self, vel):
+        self.y += vel
+
+    def reach_end(self, height):
+        return not(self.y <= height and self.y >= 0)
+
+    def impact(self, object):
+        return ship_impact(self, object)
+
+class Enemy_Bullet:
     def __init__(self, x, y, img):
         self.x = x
         self.y = y
@@ -76,9 +95,12 @@ class ship:
     
     def shoot(self):
         if self.cool_down_counter == 0:
-            bullet = Bullet(self.x, self.y, self.bullet_img)
+            bullet = Bullet(self.x + 25, self.y + 20, self.bullet_img)
             self.bullets.append(bullet)
             self.cool_down_counter = 1
+            bullet_sound = pygame.mixer.Sound("song/bulletsound.wav")
+            bullet_sound.set_volume(0.3)
+            pygame.mixer.Sound.play(bullet_sound)
 
     def get_height(self):
         return self.ship_img.get_height()
@@ -116,10 +138,15 @@ class Player(ship):
         pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10))
 
 class Enemy(ship):
-    def __init__(self, x,  y, health=10):
+    SHIPS = {
+        "ship1": (ENEMY, ENEMY_BULLET),
+        "ship2": (ENEMY2, ENEMY_BULLET),
+        "ship3": (ENEMY3, ENEMY_BULLET)
+    }
+
+    def __init__(self, x,  y, color, health=10):
         super().__init__(x, y, health)
-        self.ship_img = ENEMY
-        self.bullet_img = BULLET
+        self.ship_img, self.bullet_img = self.SHIPS[color]
         self.mask = pygame.mask.from_surface(self.ship_img)
 
     def movement(self, vel):
@@ -127,9 +154,12 @@ class Enemy(ship):
 
     def shoot(self):
         if self.cool_down_counter == 0:
-            enemybullet = Bullet(self.x-20, self.y, self.bullet_img)
+            enemybullet = Enemy_Bullet(self.x + 20, self.y + 20, self.bullet_img)
             self.bullets.append(enemybullet)
             self.cool_down_counter = 1
+            bullet_sound = pygame.mixer.Sound("song/bulletsound.wav")
+            bullet_sound.set_volume(0.3)
+            pygame.mixer.Sound.play(bullet_sound)
 
 def ship_impact(object1, object2):
     set_x = object2.x - object1.x
@@ -183,7 +213,7 @@ def game():
             #MAIN_WINDOW.blit(enemy_width, (200, 200))
 
         if lose:
-            lose_text = lose_font.render("Read the textbook", 1, (255, 255, 255))
+            lose_text = game_font.render("READ THE TEXTBOOK", 1, (255, 255, 255))
             MAIN_WINDOW.blit(lose_text, (WIN_WIDTH / 2 - lose_text.get_width()/2, 350))
 
         pygame.display.update()
@@ -197,16 +227,13 @@ def game():
             lose_count += 1
         
         if lose:
-            if lose_count > 5:
-                play = False
-            else:
-                continue
+            play = False
         
         if len(listenemies) == 0:
             round += 1
             round_length += 2
             for count in range(round_length):
-                enemy = Enemy(random.randrange(50, WIN_WIDTH-100), random.randrange(-1000, -100))
+                enemy = Enemy(random.randrange(50, WIN_WIDTH-100), random.randrange(-1000, -100), random.choice(["ship1", "ship2", "ship3"]))
                 listenemies.append(enemy)
 
         for event in pygame.event.get():
@@ -240,15 +267,15 @@ def game():
                 listenemies.remove(enemy)
 
         player_ship.move_bullet(-bullet_speed, listenemies)
-    
+
     pygame.mixer.music.stop()
-    pygame.mixer.music.set_volume(1)
+    pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.load('song/Menu_Music.wav')
     pygame.mixer.music.play(-1)
 
 def mainmenu():
     mainscreen = True
-    pygame.mixer.music.set_volume(1)
+    pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.load('song/Menu_Music.wav')
     pygame.mixer.music.play(-1)
     while mainscreen:
